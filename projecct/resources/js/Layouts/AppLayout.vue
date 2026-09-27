@@ -268,7 +268,7 @@ onMounted(() => {
     // Okunmamış mesaj sayacı: Echo (anlık) + polling yedeği
     if (user.value) {
         subscribeUnreadEcho();
-        unreadPollTimer = setInterval(refreshUnreadCount, 15000);
+        unreadPollTimer = setInterval(refreshUnreadCount, 4000);
     }
     nextTick(() => window.initKT && window.initKT());
 });

@@ -34,20 +34,28 @@ function toggleSound() {
     localStorage.setItem(SOUND_KEY, soundOn.value ? '1' : '0');
 }
 let audioCtx = null;
+function ensureAudio() {
+    try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { /* ses desteklenmiyorsa sessiz geç */ }
+    return audioCtx;
+}
 function playBeep() {
     if (!soundOn.value) return;
     try {
-        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
         o.type = 'sine';
-        o.frequency.setValueAtTime(660, audioCtx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12);
-        g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(); o.stop(audioCtx.currentTime + 0.3);
+        o.frequency.setValueAtTime(660, ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.3);
     } catch (e) { /* ses çalınamazsa sessiz geç */ }
 }
 
@@ -141,10 +149,15 @@ function teardownEcho() {
 }
 
 onMounted(() => {
+    // Tarayıcı autoplay politikası AudioContext'i "suspended" başlatır; ilk kullanıcı
+    // etkileşiminde aç ki gelen mesajda bildirim sesi çalabilsin.
+    const unlock = () => ensureAudio();
+    document.addEventListener('click', unlock, { once: true });
+    document.addEventListener('keydown', unlock, { once: true });
     if (props.active) {
         scrollBottom();
         subscribeEcho();
-        pollTimer = setInterval(poll, 12000); // Echo yedeği (bağlantı düşerse)
+        pollTimer = setInterval(poll, 3000); // Reverb yoksa yakın-anlık yedek
     }
 });
 
@@ -153,7 +166,7 @@ watch(() => props.active?.id, (id, old) => {
     items.splice(0, items.length, ...(props.messages || []));
     teardownEcho();
     subscribeEcho();
-    if (props.active) { scrollBottom(); if (!pollTimer) pollTimer = setInterval(poll, 12000); }
+    if (props.active) { scrollBottom(); if (!pollTimer) pollTimer = setInterval(poll, 3000); }
 });
 
 onBeforeUnmount(() => {

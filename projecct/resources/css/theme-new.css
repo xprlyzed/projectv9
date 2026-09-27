@@ -290,7 +290,7 @@ html.theme-switching *::after {
 
 #kt_app_sidebar,
 .app-sidebar {
-    background: var(--color-sidebar-bg) !important;
+    background: var(--bg-soft) !important;
     border-right: 1px solid var(--border) !important;
     transition: background .25s ease, border-color .25s ease;
 }

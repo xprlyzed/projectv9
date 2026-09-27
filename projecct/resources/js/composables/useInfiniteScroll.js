@@ -12,6 +12,7 @@ export function useInfiniteScroll(resolveUrl, initial, resolveParams = () => ({}
     async function loadMore() {
         if (loading.value || !hasMore.value) return;
         loading.value = true;
+        const startedAt = Date.now();
         try {
             const { data } = await axios.get(resolveUrl(), {
                 params: { ...resolveParams(), page: page.value + 1 },
@@ -24,6 +25,13 @@ export function useInfiniteScroll(resolveUrl, initial, resolveParams = () => ({}
         } catch (e) {
             hasMore.value = false;
         } finally {
+            // Skeleton'ın gerçekten görünmesi için minimum gösterim süresi (hızlı ağda
+            // veri anında gelince iskelet göz açıp kapayana kadar kaybolmasın).
+            const elapsed = Date.now() - startedAt;
+            const minVisible = 650;
+            if (elapsed < minVisible) {
+                await new Promise((r) => setTimeout(r, minVisible - elapsed));
+            }
             loading.value = false;
         }
     }

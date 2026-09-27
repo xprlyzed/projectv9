@@ -27,6 +27,11 @@
 admin@test.com · seller@test.com · buyer@test.com
 
 ## Kapsam Dışı Bırakılanlar (gözlem)
+### Regresyon Düzeltmeleri (2. oturum)
+- Sidebar rengi geri alındı: `.app-sidebar` background `var(--color-sidebar-bg)` → `var(--bg-soft)`. Diğer renkler (buton/rozet/fiyat) korundu.
+- Skeleton görünürlüğü: useInfiniteScroll'a min 650ms loading süresi → Browse'da 8 skeleton doğrulandı (dark+light gradyan).
+- Mesajlaşma: Messages poll 12s→3s; AudioContext resume+unlock (ses); badge poll 15s→4s. Sunucu testi: alıcı unread 0→1.
+
 - Register step2 (satıcı) IBAN/vergi backend validasyonu mevcut haliyle korundu (yalnızca uzunluk); gerçek IBAN mod-97 doğrulaması eklenmedi (kapsam dışı).
 - Reverb/LiveKit preview'da anahtarsız; gerçek zamanlı push production'da çalışır, preview'da polling yedeği devrede.
 
