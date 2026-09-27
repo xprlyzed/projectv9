@@ -1,0 +1,23 @@
+{
+  "summary": "Verified chat large-message layout bug fix on /messages/3 as buyer@test.com. Sent (a) 800-char unbroken 'aaaa...' string and (b) ~2000-char normal message. In both cases horizontal overflow = 0 (document.documentElement.scrollWidth === window.innerWidth = 1920), left sidebar + conversation list stayed in place (msg-list at x=324, width=320, visible=true), message bubble wrapped and stayed within chat panel (bubbleWidth 848 / chatWidth 1218 = 0.696, i.e. ~70% <= 72% cap), and compose input + send button remained visible/usable. Verified msg-bubble-body computed styles: word-break=break-word, overflow-wrap=anywhere, white-space=pre-wrap. Also verified a normal short message ('Hello short test') sends and appends to the thread correctly.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Login submit initially bounced back to /login on first automated attempt (likely CSRF/cookie race in headless), but succeeded after clearing cookies and awaiting the POST /login 302 response. Non-blocking for the bug under test, but worth noting for future automation.",
+    "Preload warnings in console for keenicons/bootstrap-icons fonts (unused within a few seconds of load). Cosmetic; consider adjusting rel=preload usage or removing unused preloads."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped)", "frontend": "100%"},
+  "test_credentials": "buyer@test.com / password (worked); conversation id 3 with seller.",
+  "seed_data_creation": "None. Used existing conversation 3.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bug fix (min-width:0 on msg-layout/msg-chat/msg-thread/msg-list and overflow-wrap:anywhere + word-break:break-word + white-space:pre-wrap on .msg-bubble-body) is working. Measurements after 800 unbroken chars and 2000 normal chars: overflow=0, bubble ratio ~0.696 of chat width, conv list intact. For login automation, clear cookies then await POST /login response before proceeding.",
+  "rca of the issue": "Original layout break was caused by grid/flex children not having min-width:0 (default is auto for flex/grid items) which allowed long unbroken text to expand the child track and push the sidebar off-screen. Fix: set min-width:0 on .msg-layout/.msg-chat/.msg-thread/.msg-list so they can shrink below content min-content width, and set overflow-wrap:anywhere + word-break:break-word + white-space:pre-wrap on .msg-bubble-body so unbroken strings break inside the bubble. Verified: 800 'a' string wraps into multiple lines inside the bubble; no horizontal page scroll."
+}
