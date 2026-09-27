@@ -33,7 +33,7 @@ class HandleInertiaRequests extends Middleware
                     'is_admin'   => $user->isAdmin(),
                     'is_seller'  => $user->isSeller(),
                     'is_buyer'   => method_exists($user, 'isBuyer') ? $user->isBuyer() : $user->hasRole('buyer'),
-                    'unread_messages'      => $user->unreadMessagesCount(),
+                    'unread_messages'      => fn () => $user->unreadMessagesCount(),
                     'unread_notifications' => $user->unreadNotifications->count(),
                     'seller_live_badge'    => $user->isSeller()
                         ? $user->auctions()->where('status', 'active')->where('stream_mode', 'live')->count()

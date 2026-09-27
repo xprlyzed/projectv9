@@ -31,6 +31,8 @@ admin@test.com · seller@test.com · buyer@test.com
 - Sidebar rengi geri alındı: `.app-sidebar` background `var(--color-sidebar-bg)` → `var(--bg-soft)`. Diğer renkler (buton/rozet/fiyat) korundu.
 - Skeleton görünürlüğü: useInfiniteScroll'a min 650ms loading süresi → Browse'da 8 skeleton doğrulandı (dark+light gradyan).
 - Mesajlaşma: Messages poll 12s→3s; AudioContext resume+unlock (ses); badge poll 15s→4s. Sunucu testi: alıcı unread 0→1.
+- **Rozet anında düşme**: `HandleInertiaRequests` `unread_messages` eager değer → `fn()=>...` lazy closure. Inertia share() controller'dan ÖNCE çalıştığı için eski (okunmadan önceki) sayı geliyordu; closure yanıt anında (index() okundu işaretledikten sonra) çözülüyor. Kanıt: liste sayfası unread=1 → sohbet açılınca AYNI yanıtta unread=0 → sidebar rozeti poll beklemeden anında düşüyor.
+
 
 - Register step2 (satıcı) IBAN/vergi backend validasyonu mevcut haliyle korundu (yalnızca uzunluk); gerçek IBAN mod-97 doğrulaması eklenmedi (kapsam dışı).
 - Reverb/LiveKit preview'da anahtarsız; gerçek zamanlı push production'da çalışır, preview'da polling yedeği devrede.
